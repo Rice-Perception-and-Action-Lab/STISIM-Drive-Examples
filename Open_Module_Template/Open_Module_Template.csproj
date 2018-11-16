@@ -40,7 +40,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="Interop.TJRWinTools3">
-      <HintPath>H:\Open Module\Interop.TJRWinTools3.dll</HintPath>
+      <HintPath>..\..\..\Open Module\Interop.TJRWinTools3.dll</HintPath>
       <EmbedInteropTypes>True</EmbedInteropTypes>
     </Reference>
     <Reference Include="System" />
@@ -56,6 +56,7 @@
   <ItemGroup>
     <Compile Include="OM_Module.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="TdkInterface.cs" />
   </ItemGroup>
   <ItemGroup>
     <COMReference Include="stdole">
