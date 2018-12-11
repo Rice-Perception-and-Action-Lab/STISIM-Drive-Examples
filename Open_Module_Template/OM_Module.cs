@@ -23,7 +23,6 @@ using Interop.TJRWinTools3; //Don't forget to add TJRWinTools3.dll as a referenc
 using System.Runtime.Serialization.Formatters.Binary;
 using System.Windows.Forms;
 
-
 namespace Open_Module_Template
 {
     [Guid("193C81B4-8633-445B-A571-12AEE7EB3BB3")]
@@ -123,9 +122,10 @@ namespace Open_Module_Template
         private bool TactorInterfaceInitialized = false;
         private bool TactorControllerConnected = false;
         private const float TACTORINTERVAL = 1.0f;
-		private string sComName;
         static double StartTime;
         static bool TactorsActive = false;
+        private string sComName;
+        private int TactorToggle;
 
        
 
@@ -240,7 +240,7 @@ namespace Open_Module_Template
             //If you want to create your own custom UI, do it here.
 
             StreamReader ParamsIn;
-            string[] SoundFileNames = new string[2];
+            string[] SoundFileNames = new string[3];
 
             try
             {
@@ -261,6 +261,8 @@ namespace Open_Module_Template
                     {
                         SoundFileNames[1] = null;
                     }
+                    SoundFileNames[2] = ParamsIn.ReadLine();
+                    TactorToggle = Convert.ToInt32(SoundFileNames[2]);
                     ParamsIn.Close();
 
                 }
@@ -320,68 +322,77 @@ namespace Open_Module_Template
             //Called once before the simulation and is accessed only once during simulation.
             //Do all initializing here.
 
-            //Initialize tactor interface
-            try
+            if (TactorToggle == 1) //Checks the third line in Open_Module_Template.ini  1 = use tactors 0 = do not use tactors
             {
-                Tdk.TdkInterface.InitializeTI();
-                TactorInterfaceInitialized = true;
-
-            }
-            catch
-            {
-                TactorInterfaceInitialized = false;
-                //MessageBox.Show(": Unable to initialize tactor interface");
-                OM_ErrorMessage = ProcessError(": Unable to Initialize tactor controller box. Make sure TDKInterface.cs is in your project and make sure the .dll file paths are correct");
-                return false;
-            }
-
-
-
-
-            //Attempt to connect to tactor controller
-            try
-            {
-				int ret = Tdk.TdkInterface.Discover((int)Tdk.TdkDefines.DeviceTypes.Serial);
-				if (ret > 0)
-				{
-					for (int i = 0; i < ret; i++)
-					{
-						//Gets the discovered device name at the index i
-						System.IntPtr discoveredNamePTR = Tdk.TdkInterface.GetDiscoveredDeviceName(i);
-						if (discoveredNamePTR != null)
-						{
-							sComName = Marshal.PtrToStringAnsi(discoveredNamePTR);
-							//WriteMessageToGUIConsole(sComName + "\n");
-						}
-					}
-
-				}
-                string selectedComPort = sComName;
-                ret = Tdk.TdkInterface.Connect(selectedComPort,(int)Tdk.TdkDefines.DeviceTypes.Serial,System.IntPtr.Zero);
-                //MessageBox.Show("ret " + ret);
-                if (ret >= 0)
+                //Initialize tactor interface
+                try
                 {
-                    ConnectedDeviceID = ret;
-                    TactorControllerConnected = true;
+                    Tdk.TdkInterface.InitializeTI();
+                    TactorInterfaceInitialized = true;
+
                 }
-                else
+                catch
                 {
-                    TactorControllerConnected = false;
-                    //MessageBox.Show("Unable to connect to tactor controller box");
-                    OM_ErrorMessage = ProcessError(": Unable to connect to tactor controller box. Make sure the device is connected to the PC and powered on. Also make sure you are calling the correct COM port");
+                    TactorInterfaceInitialized = false;
+                    //MessageBox.Show(": Unable to initialize tactor interface");
+                    OM_ErrorMessage = ProcessError(": Unable to Initialize tactor controller box. Make sure TDKInterface.cs is in your project and make sure the .dll file paths are correct");
                     return false;
                 }
 
-            }
-            //If unable to connect return the error to OM error sring and quit
-            catch
-            {
-                TactorControllerConnected = false;
-                //MessageBox.Show("Unable to connect to tactor controller box");
-                OM_ErrorMessage = ProcessError(": Unable to connect to tactor controller box. Unable to call connect function.");
-                return false;
-            }
 
+
+
+                //Conect to tactor conroller
+                try
+                {
+                    int ret = Tdk.TdkInterface.Discover((int)Tdk.TdkDefines.DeviceTypes.Serial);
+                    if (ret > 0)
+                    {
+                        for (int i = 0; i < ret; i++)
+                        {
+                            //Gets the discovered device name at the index i
+                            System.IntPtr discoveredNamePTR = Tdk.TdkInterface.GetDiscoveredDeviceName(i);
+                            if (discoveredNamePTR != null)
+                            {
+                                sComName = Marshal.PtrToStringAnsi(discoveredNamePTR);
+                            }
+                            else
+                            {
+                                OM_ErrorMessage = ProcessError(": Unable to connect to tactor controller box. Auto discovery method has failed. Check power and connection to tactor controller.");
+                                return false;
+                            }
+
+                        }
+
+                    }
+
+                    string selectedComPort = sComName;
+                    ret = Tdk.TdkInterface.Connect(selectedComPort,
+                                                   (int)Tdk.TdkDefines.DeviceTypes.Serial,
+                                                    System.IntPtr.Zero);
+                    //MessageBox.Show("ret " + ret);
+                    if (ret >= 0)
+                    {
+                        ConnectedDeviceID = ret;
+                        TactorControllerConnected = true;
+                    }
+                    else
+                    {
+                        TactorControllerConnected = false;
+                        //MessageBox.Show("Unable to connect to tactor controller box");
+                        OM_ErrorMessage = ProcessError(": Unable to connect to tactor controller box. Make sure the device is connected to the PC and powered on. Also make sure you are calling the correct COM port");
+                        return false;
+                    }
+
+                }
+                catch
+                {
+                    TactorControllerConnected = false;
+                    //MessageBox.Show("Unable to connect to tactor controller box");
+                    OM_ErrorMessage = ProcessError(": Unable to connect to tactor controller box. Unable to call connect function.");
+                    return false;
+                }
+            }
             try
             {
                 //Create some variables to be used locally
@@ -1319,6 +1330,7 @@ namespace Open_Module_Template
             V[i].Lat = YInit;
             V[i].Speed = Speed;
             V[i].InitialHeading = 0;
+
             //MessageBox.Show("XInit " + XInit + " YInit " + YInit + " Speed " + Speed + " Name " + ModelName);
             //MessageBox.Show("V.Lon " + V[i].Lon + " V.Lat " + V[i].Lat + " Speed " + V[i].Speed + " Name " + ModelName);
             terrainObj.RoadQuery(V[i].Lon, V[i].Lat, V[i].SixDOF.X, V[i].SixDOF.Y, V[i].SixDOF.Z, Grade, CrossSlope, Heading, SegType, LaneNum);
@@ -1328,7 +1340,7 @@ namespace Open_Module_Template
             temp2 = temp2.Trim();
             St = "Vehicle_" + temp2;    
             V[i].Index = graphicsObj.LoadGraphicObject(V[i].SixDOF, ID_World, ModelName, St, STAGE_NORMAL);
-            MessageBox.Show("Value of Vehicle index after LoadGraphic Object " + V[i].Index);
+            //MessageBox.Show("Value of Vehicle index after LoadGraphic Object " + V[i].Index);
             V[i].VisFlag = GRAPHICS_IMAGE_ON;
             graphicsObj.SetObjectVisibility(V[i].Index, V[i].VisFlag);
 

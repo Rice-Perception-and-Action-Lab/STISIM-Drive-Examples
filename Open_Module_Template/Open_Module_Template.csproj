@@ -40,7 +40,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="Interop.TJRWinTools3">
-      <HintPath>..\..\..\Open Module\Interop.TJRWinTools3.dll</HintPath>
+      <HintPath>..\..\..\STISIM3\Open Module\Interop.TJRWinTools3.dll</HintPath>
       <EmbedInteropTypes>True</EmbedInteropTypes>
     </Reference>
     <Reference Include="System" />
