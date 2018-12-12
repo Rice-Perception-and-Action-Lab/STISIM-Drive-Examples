@@ -2,7 +2,7 @@
 ' Author:                   Adam Braly
 ' Example based on code by: Theodore Rosenthal - Systems Technology Inc.
 ' Date:                     08-27-2018
-' Updated:                  11-15-2018
+' Updated:                  12-12-2018
 ' Language:                 C# COM Interface
 ' 
 ' STISIM Open Module Template with examples for
