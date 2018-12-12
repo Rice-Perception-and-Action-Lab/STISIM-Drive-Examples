@@ -782,9 +782,9 @@ namespace Open_Module_Template
                     for (i = 0; i <= NumVehicles - 1; i++)
                     {
                         // MessageBox.Show("d " + i);
-                        V[i].Lon = V[i].Lon + V[i].Speed + DV.TimeInc;
+                        V[i].Lon = V[i].Lon + V[i].Speed * DV.TimeInc;
                         //MessageBox.Show("e " + i);
-                        terrainObj.RoadQuery(V[i].Lon, V[i].Lat, V[i].SixDOF.X, V[i].SixDOF.Y, V[i].SixDOF.Z, Grade, CrossSlope, V[i].SixDOF.Psi, SegType, LaneNum);
+                        terrainObj.RoadQuery(ref V[i].Lon, ref V[i].Lat, ref V[i].SixDOF.X, ref V[i].SixDOF.Y, ref V[i].SixDOF.Z, ref Grade, ref CrossSlope, ref V[i].SixDOF.Psi, ref SegType, ref LaneNum);
                         // MessageBox.Show("f " + i);
                         //MessageBox.Show("Values from RoadQuery during update: V[i].Lon " + V[i].Lon + " V[i].Lat " + V[i].Lat + " V[i].SixDOF.X " + V[i].SixDOF.X + " V[i].SixDOF.Y " + V[i].SixDOF.Y + " V[i].SixDOF.Z " + V[i].SixDOF.Z + " Grade " + Grade + " CrossSlope " + CrossSlope + " V[i].SixDOF.Psi " + V[i].SixDOF.Psi + " SegType " + SegType + " LaneNum " + LaneNum);
                         V[i].SixDOF.Theta = Math.Atan(Grade);
@@ -793,13 +793,13 @@ namespace Open_Module_Template
                         //  MessageBox.Show("h " + i);
 
                         //update the vehicle's position in the graphics world
-                        graphicsObj.SetObjectPosition(V[i].Index, V[i].SixDOF);
+                        graphicsObj.SetObjectPosition(ref V[i].Index, ref V[i].SixDOF);
                         //  MessageBox.Show("i " + i);
                         //MessageBox.Show("Values after SetObjPos call in Update: V[i].Index " + V[i].Index + " V[i].SixDOF.X " + V[i].SixDOF.X + " V[i].SixDOF.Y " + V[i].SixDOF.Y + " V[i].SixDOF.Z " + V[i].SixDOF.Z);
                         //change the wheel speed if desired
                         V[i].SpinSpeed = V[i].Speed * V[i].SpinDuration / WHEELSPINFACTOR;
                         //  MessageBox.Show("j " + i);
-                        graphicsObj.SetAnimationScale(V[i].Index, V[i].SpinModel, V[i].SpinSpeed);
+                        graphicsObj.SetAnimationScale(ref V[i].Index, ref V[i].SpinModel, ref V[i].SpinSpeed);
                         //  MessageBox.Show("k " + i);
 
                         //compute the values for the closes vehicle that is in the driver's lane
@@ -1333,7 +1333,7 @@ namespace Open_Module_Template
 
             //MessageBox.Show("XInit " + XInit + " YInit " + YInit + " Speed " + Speed + " Name " + ModelName);
             //MessageBox.Show("V.Lon " + V[i].Lon + " V.Lat " + V[i].Lat + " Speed " + V[i].Speed + " Name " + ModelName);
-            terrainObj.RoadQuery(V[i].Lon, V[i].Lat, V[i].SixDOF.X, V[i].SixDOF.Y, V[i].SixDOF.Z, Grade, CrossSlope, Heading, SegType, LaneNum);
+            terrainObj.RoadQuery(ref V[i].Lon, ref V[i].Lat, ref V[i].SixDOF.X, ref V[i].SixDOF.Y, ref V[i].SixDOF.Z, ref Grade, ref CrossSlope, ref Heading, ref SegType, ref LaneNum);
             //MessageBox.Show("Values after RoadQuery call in SetUpVehciles: V[i].Lon " + V[i].Lon + " V[i].Lat " + V[i].Lat + " V[i].SixDOF.X " + V[i].SixDOF.X + " V[i].SixDOF.Y " + V[i].SixDOF.Y + " V[i].SixDOF.Z " + V[i].SixDOF.Z + " Grade " + Grade + " CrossSlope " + CrossSlope + " Heading " + Heading + " SegType " + SegType + " LaneNum " + LaneNum);
             //load image for the vehicle with brake lights off, and set its visibility on
             temp2 = i.ToString();
@@ -1368,7 +1368,7 @@ namespace Open_Module_Template
             graphicsObj.SetAnimationState(V[i].Index, V[i].SpinModel, GAPM_PLAY_LOOP);
             graphicsObj.SetAnimationScale(V[i].Index, V[i].SpinModel, V[i].SpinSpeed);
 
-        }
+        }   
 
         //Originally thought we would need this function to deep copy TJR interface objects and structs
         //Function didn't work as inteded, didn't use/didn't need
